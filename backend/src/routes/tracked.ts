@@ -169,9 +169,50 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
       last_price: trackedRecord.last_price
     },
     { db, trigger: 'manual' }
-  ).catch((err) => {
-    console.error(`Initial scrape for product ${trackedRecord.id} failed:`, err.message);
-  });
+  )
+    .then((result) => {
+      if (!db && result) {
+        const now = new Date().toISOString();
+        const currentLogs = memoryStore.logs.get(trackedRecord.id) || [];
+        const currentHistory = memoryStore.history.get(trackedRecord.id) || [];
+
+        currentLogs.unshift({
+          id: `log-${Date.now()}`,
+          product_id: trackedRecord.id,
+          trigger: 'manual',
+          started_at: now,
+          finished_at: now,
+          duration_ms: result.durationMs,
+          outcome: result.outcome,
+          attempts: result.attempts,
+          http_status: 200,
+          extracted_price: result.price,
+          created_at: now
+        });
+        memoryStore.logs.set(trackedRecord.id, currentLogs);
+
+        if (result.outcome === 'success' || result.outcome === 'retried') {
+          trackedRecord.last_price = result.price;
+          trackedRecord.last_stock_status = result.stock_status;
+          trackedRecord.last_scraped_at = now;
+          trackedRecord.consecutive_failures = 0;
+
+          currentHistory.push({
+            id: `hist-${Date.now()}`,
+            product_id: trackedRecord.id,
+            price: result.price,
+            currency: result.currency || 'INR',
+            stock_status: result.stock_status,
+            stock_quantity: result.stock_quantity,
+            scraped_at: now
+          });
+          memoryStore.history.set(trackedRecord.id, currentHistory);
+        }
+      }
+    })
+    .catch((err) => {
+      console.error(`Initial scrape for product ${trackedRecord.id} failed:`, err.message);
+    });
 });
 
 /**
@@ -280,6 +321,46 @@ router.post('/:id/scrape', async (req: Request, res: Response): Promise<void> =>
       },
       { db, trigger: 'manual' }
     );
+
+    // If running in memory mode without live DB, store into memoryStore
+    if (!db) {
+      const now = new Date().toISOString();
+      const currentLogs = memoryStore.logs.get(id) || [];
+      const currentHistory = memoryStore.history.get(id) || [];
+
+      currentLogs.unshift({
+        id: `log-${Date.now()}`,
+        product_id: id,
+        trigger: 'manual',
+        started_at: now,
+        finished_at: now,
+        duration_ms: result.durationMs,
+        outcome: result.outcome,
+        attempts: result.attempts,
+        http_status: 200,
+        extracted_price: result.price,
+        created_at: now
+      });
+      memoryStore.logs.set(id, currentLogs);
+
+      if (result.outcome === 'success' || result.outcome === 'retried') {
+        product.last_price = result.price;
+        product.last_stock_status = result.stock_status;
+        product.last_scraped_at = now;
+        product.consecutive_failures = 0;
+
+        currentHistory.push({
+          id: `hist-${Date.now()}`,
+          product_id: id,
+          price: result.price,
+          currency: result.currency || 'INR',
+          stock_status: result.stock_status,
+          stock_quantity: result.stock_quantity,
+          scraped_at: now
+        });
+        memoryStore.history.set(id, currentHistory);
+      }
+    }
 
     res.json({
       message: 'Scrape completed',

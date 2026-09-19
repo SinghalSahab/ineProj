@@ -9,6 +9,7 @@
     "dev": "tsx watch src/server.ts",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:reliability": "tsx test/concurrency_reliability.ts",
     "scrape:headed": "tsx src/headed.ts"
   },
   "dependencies": {

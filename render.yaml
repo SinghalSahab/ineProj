@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: price-tracker-backend
+    env: node
+    rootDir: backend
+    plan: free
+    region: oregon
+    buildCommand: npm install && npx playwright install --with-deps chromium
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: STORE_BASE_URL
+        value: https://demo.inelabteamdev.com
+      - key: ALLOWED_ORIGIN
+        sync: false
+      - key: CRON_SECRET
+        generateValue: true
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SCRAPE_CONCURRENCY
+        value: "2"
+      - key: SCRAPE_MAX_ATTEMPTS
+        value: "4"
+      - key: SCRAPE_TIMEOUT_MS
+        value: "20000"

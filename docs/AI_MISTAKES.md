@@ -47,4 +47,12 @@ This log records real errors, mistaken initial assumptions, and edge cases encou
 - **What Actually Happened**: The strict validator compared `"Product 748"` with the real page title `"Meridian Gaming Monitor X"` and legitimately rejected it as a product identity mismatch (`structure_changed`).
 - **The Fix**: In `headed.ts`, we first query the store's `/api/product/:id` metadata to get the authentic product name (or pass `undefined` if not known), allowing the validator to match against the real expected title.
 
+---
+
+### Mistake 8: Hardcoding Guessed Product Names in Concurrency Benchmark
+- **Mistaken Assumption**: When setting up the 30-iteration unattended benchmark, we assumed ID `549` corresponded to "Aero Wireless Keyboard" and `812` to "Nexus Studio Headphones".
+- **What Actually Happened**: When Playwright fetched the pages, ID 549 was actually "Larkspur Sous-Vide Wand Two" and ID 812 was "Summit Cloudbook XL". The strict validator caught the discrepancy immediately and aborted with `[structure_changed] Product identity mismatch`, refusing to write any rows to `price_history`.
+- **The Fix**: Dynamically queried `/api/catalog` from the mock store in the test harness so that the product list and expected names are guaranteed to match the live catalog.
+
+
 

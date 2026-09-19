@@ -54,5 +54,13 @@ This log records real errors, mistaken initial assumptions, and edge cases encou
 - **What Actually Happened**: When Playwright fetched the pages, ID 549 was actually "Larkspur Sous-Vide Wand Two" and ID 812 was "Summit Cloudbook XL". The strict validator caught the discrepancy immediately and aborted with `[structure_changed] Product identity mismatch`, refusing to write any rows to `price_history`.
 - **The Fix**: Dynamically queried `/api/catalog` from the mock store in the test harness so that the product list and expected names are guaranteed to match the live catalog.
 
+---
+
+### Mistake 9: Decoy Typography Concatenation Under Rapid Mutation
+- **Mistaken Assumption**: Assuming DOM price containers would always settle before children nodes rendered.
+- **What Actually Happened**: On Run 15, rapid DOM mutations caused the container text to be queried before the discount badge finished detaching, extracting a concatenated number `13726905932`.
+- **The Fix & Defense**: Our strict validator intercepted the value with `[validation_error] Price exceeds sanity threshold: 13726905932`. It blocked `price_history` insertion completely, logged an honest error, and automatically triggered a clean retry.
+
+
 
 

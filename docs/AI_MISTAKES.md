@@ -33,5 +33,10 @@ This log records real errors, mistaken initial assumptions, and edge cases encou
 ### Mistake 5: Trap Decoy Element `<span class="price-value" style="display:none">`
 - **Mistaken Assumption**: We looked for `.price-value` as the selector for the current price.
 - **What Actually Happened**: The mock store deliberately injects a hidden decoy `<span class="price-value" style="display:none">₹12,462</span>` to trick scrapers! When stripped because of `display:none`, our parser fell back to the whole container, concatenating MRP (`₹15,911`), deal price (`₹12,968`), selling price (`₹10,024`), discount (`37% off`), and stock into one giant number `159111296810024370000`.
-- **The Catch & Fix**: Our strict `validator.ts` immediately threw `Price exceeds sanity threshold`, preventing bad data from entering the database! We updated the DOM extractor to find the visible, non-strikethrough child in `.price-main` with the largest typography (`fontSize >= 2rem`).
+---
+
+### Mistake 6: TypeScript Type Assertion Inside Browser Evaluation String
+- **Mistaken Assumption**: We included `(stockItem as HTMLElement).innerText` inside `DOM_CLEAN_PRICE_SCRIPT`.
+- **What Actually Happened**: `DOM_CLEAN_PRICE_SCRIPT` is passed as a string to `page.evaluate()` which executes in the browser's native JavaScript engine. The browser threw `SyntaxError: Unexpected identifier 'as'`.
+- **The Fix**: Removed TypeScript syntax inside browser string templates, using vanilla JavaScript property access `(f && f.innerText)`.
 

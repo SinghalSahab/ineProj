@@ -226,9 +226,9 @@ export const DOM_CLEAN_PRICE_SCRIPT = `
     const facets = document.querySelector('.price-facets');
     if (facets) {
       const facetItems = Array.from(facets.children);
-      const stockItem = facetItems.find(f => /in stock|out of stock|left|stock/i.test(f.innerText || ''));
-      if (stockItem) {
-        rawStock = (stockItem as HTMLElement).innerText.trim();
+      const stockItem = facetItems.find(f => /in stock|out of stock|left|stock/i.test((f && f.innerText) || ''));
+      if (stockItem && stockItem.innerText) {
+        rawStock = stockItem.innerText.trim();
       }
     }
     if (!rawStock) {

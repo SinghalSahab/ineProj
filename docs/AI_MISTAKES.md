@@ -40,3 +40,11 @@ This log records real errors, mistaken initial assumptions, and edge cases encou
 - **What Actually Happened**: `DOM_CLEAN_PRICE_SCRIPT` is passed as a string to `page.evaluate()` which executes in the browser's native JavaScript engine. The browser threw `SyntaxError: Unexpected identifier 'as'`.
 - **The Fix**: Removed TypeScript syntax inside browser string templates, using vanilla JavaScript property access `(f && f.innerText)`.
 
+---
+
+### Mistake 7: CLI Placeholder Name Triggering False Identity Mismatch
+- **Mistaken Assumption**: In `headed.ts`, we defaulted `name: \`Product \${id}\`` when invoking the scraper.
+- **What Actually Happened**: The strict validator compared `"Product 748"` with the real page title `"Meridian Gaming Monitor X"` and legitimately rejected it as a product identity mismatch (`structure_changed`).
+- **The Fix**: In `headed.ts`, we first query the store's `/api/product/:id` metadata to get the authentic product name (or pass `undefined` if not known), allowing the validator to match against the real expected title.
+
+

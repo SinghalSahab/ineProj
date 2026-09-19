@@ -1,0 +1,69 @@
+{
+  "catalog": {
+    "page": 1,
+    "pageSize": 10,
+    "pages": 100,
+    "total": 1000,
+    "items": [
+      {
+        "id": 748,
+        "slug": "meridian-gaming-monitor-x",
+        "name": "Meridian Gaming Monitor X",
+        "brand": "Meridian",
+        "category": "Monitors",
+        "sku": "MER-10748",
+        "description": "The Meridian Gaming Monitor X. A dependable monitors pick with a clean, no-nonsense design and the everyday features you actually use."
+      },
+      {
+        "id": 549,
+        "slug": "larkspur-sous-vide-wand-two",
+        "name": "Larkspur Sous-Vide Wand Two",
+        "brand": "Larkspur",
+        "category": "Kitchen",
+        "sku": "LAR-10549",
+        "description": "The Larkspur Sous-Vide Wand Two. A dependable kitchen pick with a clean, no-nonsense design and the everyday features you actually use."
+      }
+    ]
+  },
+  "product_detail_748": {
+    "id": 748,
+    "slug": "meridian-gaming-monitor-x",
+    "name": "Meridian Gaming Monitor X",
+    "brand": "Meridian",
+    "category": "Monitors",
+    "sku": "MER-10748",
+    "description": "The Meridian Gaming Monitor X. A dependable monitors pick with a clean, no-nonsense design and the everyday features you actually use.",
+    "specs": {
+      "warranty": "5 years limited warranty",
+      "inTheBox": "Gaming Monitor, VESA adapter plate, DisplayPort cable, Quick-start guide",
+      "countryOfOrigin": "Thailand",
+      "returns": "7-day return or replacement",
+      "support": "Phone and email, 10am–6pm IST, Mon–Sat",
+      "weightGrams": 4319,
+      "material": "ABS with soft-touch coating",
+      "colour": "Midnight Navy",
+      "modelYear": 2022
+    }
+  },
+  "challenge": {
+    "salt": "3d37882244de378b9ea296d19a8d4adb",
+    "ts": 1789851477455,
+    "difficulty": 3,
+    "csig": "853d4e57240a714780dd3ddc5c7422a2a77c7c681f859901326dfe5b8e4dcc31",
+    "wasm": "AGFzbQEAAAABBgFgAX8BfwMCAQAHBQEBZgAACtsEAdgEACAAQYzHruUHa0HV1tGJe3NB3aK8on5sQaC33/YDc0Gqpsu4fmtBtrCVwAJrQZX6mJZ7c0HExfahf2tBwfDKoAJsQaG+xzxsQbam7c94c0H16bzfBWpB2oy73wdqQQh3QYudzdUFakHl+f+jBWtB/9i2tAFrQaaJ1cJ9c0EHd0HFlP/DAWxBwY2dwgZzQbD3854GakGvwMuDf2xBBndBwYzO2XlzQdekycMFbEHTyIaxfnNBhLGiswRqQRh3QRd3QaS31uV5a0GN1LqmfXNBHHdBEXdB0dS6owdsQfuar7gCc0HO7uPZBnNBy4K6gH9zQZ3Bqf5+a0HP0LWgeXNB+e/dM2xBBHdB19nwsnpsQe6mrdt9akH1zIGlA2pB24Gf9XhzQc/M0dl9c0Ebd0GNnOCrBGxBo/z5/QRsQbShudAAa0GgsqXtAXNB2YCon39sQe/c0vMFa0HzkOzuBWxBi+mf7gNzQcGq5Jh/c0GDheb0eWxBv6HV2gVsQbCA6qt5akHKxIaqemtB/Nug+gZqQdDz9doBa0EQd0Hps+jWfXNBuKzf0HxqQYfIwtB9a0EYd0Guv4/zBGpBxcq4hwFrQRZ3QQ13QQV3QYfslIUGa0G8qLW5BnNBlPvz5XlrQbXmpM8DakHfn+/hBWxB95qjjn5qQbDS5w1rQQl3Qca0uPUEa0GP+J/tAmpBFndBp/Sr+HxsQfLwwod9a0Hj9PeYfXNBB3dBp+ezwnhsQeKm+8YBc0Hq9K6NBmpBH3dBuqGTPGpBvaXpgQZsQbyFyPoCc0G6ndqaenML"
+  },
+  "decrypted_quote": {
+    "shown": 32999,
+    "mrp": 39999,
+    "sale": 32999,
+    "badgePct": 17,
+    "stock": 14,
+    "currency": "INR",
+    "at": 1789852262235,
+    "rating": 4.8,
+    "ratingCount": 151,
+    "seller": "CloudRetail Hub",
+    "deliveryDays": 2,
+    "pending": false
+  }
+}

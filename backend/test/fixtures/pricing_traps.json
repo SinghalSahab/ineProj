@@ -1,0 +1,76 @@
+[
+  {
+    "type": "standard_inr",
+    "raw_html": "<div class=\"price-main\"><span class=\"price-amount\">₹32,999</span></div>",
+    "expected_price": 32999.0,
+    "expected_currency": "INR"
+  },
+  {
+    "type": "trailing_tax_notice",
+    "raw_html": "<div class=\"price-main\"><span class=\"price-amount\">₹32,999/- (incl. of all taxes)</span></div>",
+    "expected_price": 32999.0,
+    "expected_currency": "INR"
+  },
+  {
+    "type": "european_format",
+    "raw_html": "<div class=\"price-main\"><span class=\"price-amount\">€32.999,00</span></div>",
+    "expected_price": 32999.0,
+    "expected_currency": "EUR"
+  },
+  {
+    "type": "spaced_format",
+    "raw_html": "<div class=\"price-main\"><span class=\"price-amount\">₹ 32 999</span></div>",
+    "expected_price": 32999.0,
+    "expected_currency": "INR"
+  },
+  {
+    "type": "unicode_fullwidth_digits",
+    "raw_html": "<div class=\"price-main\"><span class=\"price-amount\">₹３２９９９</span></div>",
+    "expected_price": 32999.0,
+    "expected_currency": "INR"
+  },
+  {
+    "type": "nbsp_and_zerowidth_spacing",
+    "raw_html": "<div class=\"price-main\"><span class=\"price-amount\">₹\u00a03\u200b2\u200b9\u200b9\u200b9</span></div>",
+    "expected_price": 32999.0,
+    "expected_currency": "INR"
+  },
+  {
+    "type": "indian_lakh_notation",
+    "raw_html": "<div class=\"price-main\"><span class=\"price-amount\">Rs.\u00a01,32,999.50</span></div>",
+    "expected_price": 132999.50,
+    "expected_currency": "INR"
+  },
+  {
+    "type": "decoy_hidden_elements",
+    "raw_html": "<div class=\"price-main\"><span class=\"price-amount\">₹32,999</span><span class=\"amount\" data-price=\"true\" aria-hidden=\"true\" style=\"display:none\">₹99,999</span><span style=\"visibility:hidden\">₹0.00</span></div>",
+    "expected_price": 32999.0,
+    "expected_currency": "INR"
+  },
+  {
+    "type": "split_characters",
+    "raw_html": "<div class=\"price-main\"><span class=\"price-amount\"><span>₹</span><span>3</span><span>2</span><span>,</span><span>9</span><span>9</span><span>9</span></span></div>",
+    "expected_price": 32999.0,
+    "expected_currency": "INR"
+  },
+  {
+    "type": "skeleton_loading",
+    "raw_html": "<div class=\"price-block\"><p class=\"price-status\">Loading current price…</p></div>",
+    "is_incomplete": true
+  },
+  {
+    "type": "retrying_state",
+    "raw_html": "<div class=\"price-block\"><p class=\"price-status\">Retrying (attempt 2/6)…</p></div>",
+    "is_incomplete": true
+  },
+  {
+    "type": "error_state",
+    "raw_html": "<div class=\"price-block price-error\"><p class=\"price-status\">Couldn’t load the price after 6 attempts.</p><p class=\"price-substatus\">Store rate limited</p></div>",
+    "is_error": true
+  },
+  {
+    "type": "zero_or_placeholder_price",
+    "raw_html": "<div class=\"price-main\"><span class=\"price-amount\">$0.00</span></div>",
+    "should_reject": true
+  }
+]

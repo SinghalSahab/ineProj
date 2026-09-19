@@ -74,6 +74,9 @@ export function parsePrice(rawString: string | null | undefined): ParsedPrice {
   cleaned = cleaned.replace(/\/-\s*$/gi, '');
   cleaned = cleaned.replace(/\(incl\..*?\)/gi, '');
 
+  // Detect negative prices before stripping characters
+  const isNegative = /-\s*\d/.test(rawString) || /-\s*[₹€$£]/.test(rawString) || /^\s*-/.test(cleaned);
+
   // 4. Strip currency words and symbols
   cleaned = cleaned
     .replace(/(INR|EUR|USD|GBP|RS\.|RS|₹|€|\$|£)/gi, '')
@@ -96,7 +99,7 @@ export function parsePrice(rawString: string | null | undefined): ParsedPrice {
     cleaned = cleaned.replace(/[\s,]/g, '');
   }
 
-  // Remove any remaining stray non-numeric characters except leading dot/minus
+  // Remove any remaining stray non-numeric characters except leading dot
   cleaned = cleaned.replace(/[^\d.]/g, '');
 
   // If there are multiple dots, keep only the last one as decimal separator
@@ -105,7 +108,10 @@ export function parsePrice(rawString: string | null | undefined): ParsedPrice {
     cleaned = parts.slice(0, -1).join('') + '.' + parts[parts.length - 1];
   }
 
-  const price = parseFloat(cleaned);
+  let price = parseFloat(cleaned);
+  if (isNegative) {
+    price = -Math.abs(price);
+  }
 
   if (isNaN(price)) {
     throw new ParseError(`Failed to parse numeric price from: "${rawString}"`, { rawString, cleaned });
@@ -177,30 +183,67 @@ export function parseStock(rawString: string | null | undefined): ParsedStock {
 }
 
 /**
- * Browser extraction script that cleans DOM by stripping invisible decoy elements.
+ * Browser extraction script that cleans DOM by stripping invisible decoy elements
+ * and isolating the authentic selling price element via computed typography.
  */
 export const DOM_CLEAN_PRICE_SCRIPT = `
   (() => {
-    const main = document.querySelector('.price-main, .price-block');
+    const main = document.querySelector('.price-main');
     if (!main) return null;
 
-    const clone = main.cloneNode(true);
+    // 1. Extract authentic selling price from .price-main children
+    let rawPrice = '';
+    const children = Array.from(main.children);
 
-    const decoys = clone.querySelectorAll(
-      '[aria-hidden=\"true\"], [style*=\"display:none\"], [style*=\"display: none\"], [style*=\"visibility:hidden\"], [style*=\"visibility: hidden\"], .amount[data-price=\"true\"]'
-    );
-    decoys.forEach(el => el.remove());
+    // Candidates must be visible and not strikethrough (MRP) or discount badge
+    const candidates = children.filter(el => {
+      const style = window.getComputedStyle(el);
+      if (style.display === 'none' || style.visibility === 'hidden') return false;
+      if (el.getAttribute('aria-hidden') === 'true') return false;
+      if (style.textDecorationLine.includes('line-through') || style.textDecoration.includes('line-through')) return false;
+      
+      const text = el.innerText || el.textContent || '';
+      if (/\\b(off|mrp|deal price)\\b/i.test(text)) return false;
+      // Must contain numbers
+      return /\\d/.test(text);
+    });
 
-    const priceValue = clone.querySelector('.price-value, .price-amount, span[class*=\"priceValue\"]') || clone;
-    const stockEl = document.querySelector('.stock-badge, .stock-facet, [class*=\"stock\"]');
+    if (candidates.length > 0) {
+      // Pick the element with the largest typography (selling price is always 2.2rem - 2.4rem)
+      candidates.sort((a, b) => {
+        const sizeA = parseFloat(window.getComputedStyle(a).fontSize) || 0;
+        const sizeB = parseFloat(window.getComputedStyle(b).fontSize) || 0;
+        return sizeB - sizeA;
+      });
+      rawPrice = candidates[0].innerText || candidates[0].textContent || '';
+    } else {
+      // Fallback
+      rawPrice = main.innerText || main.textContent || '';
+    }
+
+    // 2. Extract stock from .price-facets
+    let rawStock = '';
+    const facets = document.querySelector('.price-facets');
+    if (facets) {
+      const facetItems = Array.from(facets.children);
+      const stockItem = facetItems.find(f => /in stock|out of stock|left|stock/i.test(f.innerText || ''));
+      if (stockItem) {
+        rawStock = (stockItem as HTMLElement).innerText.trim();
+      }
+    }
+    if (!rawStock) {
+      const stockBadge = document.querySelector('.stock-badge, .stock-facet, [class*=\"stock\"]');
+      rawStock = stockBadge ? (stockBadge.textContent || '').trim() : '';
+    }
+
     const titleEl = document.querySelector('.product-title, h1');
     const skuEl = document.querySelector('.product-meta, [class*=\"sku\"]');
 
     return {
-      rawPrice: priceValue.innerText || priceValue.textContent || '',
-      rawStock: stockEl ? (stockEl.innerText || stockEl.textContent || '') : '',
-      title: titleEl ? titleEl.innerText.trim() : '',
-      meta: skuEl ? skuEl.innerText.trim() : ''
+      rawPrice,
+      rawStock,
+      title: titleEl ? titleEl.textContent?.trim() || '' : '',
+      meta: skuEl ? skuEl.textContent?.trim() || '' : ''
     };
   })()
 `;

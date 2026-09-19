@@ -39,7 +39,13 @@ export function classifyError(error: ScraperErrorLike | null | undefined): Scrap
     return 'rate_limit';
   }
 
-  if (name === 'TimeoutError' || msg.includes('timeout') || msg.includes('timed out')) {
+  if (
+    name === 'TimeoutError' ||
+    msg.includes('timeout') ||
+    msg.includes('timed out') ||
+    msg.includes('timedout') ||
+    msg.includes('etimedout')
+  ) {
     return 'timeout';
   }
 

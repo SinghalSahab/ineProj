@@ -14,4 +14,24 @@ This log records real errors, mistaken initial assumptions, and edge cases encou
 ### Mistake 2: Overlooking IP Rate Limiting on the Challenge API
 - **Mistaken Assumption**: Assuming we could rapidly poll or reload challenge endpoints during recon and batch scraping without throttling.
 - **What Actually Happened**: During the 20-reload recon test, request #13 immediately returned `HTTP 429 Too Many Requests`.
-- **The Fix**: Paced requests with concurrency limit (2–3 max) and added exponential backoff with jitter specifically handling 429 rate limit responses.
+---
+
+### Mistake 3: Negative Price Stripping in Parser Sanitization
+- **Mistaken Assumption**: We ran `cleaned.replace(/[^\d.]/g, '')` to sanitize price characters.
+- **What Actually Happened**: Stripping all non-digits inadvertently stripped leading minus signs, so negative test inputs like `-₹500` were transformed into positive `500` and passed validation.
+- **The Fix**: Preserved negative sign detection (`const isNegative = rawString.includes('-')`) and immediately rejected non-positive numbers before stripping.
+
+---
+
+### Mistake 4: Missing ETIMEDOUT in Error Classifier
+- **Mistaken Assumption**: Assuming `msg.includes('timeout') || msg.includes('timed out')` would catch Node.js socket timeout `ETIMEDOUT`.
+- **What Actually Happened**: `etimedout` contains `timedout` (no space), so it slipped through to the default `http_error` branch.
+- **The Fix**: Added `etimedout` and `timedout` to the timeout regex in `retry.ts`.
+
+---
+
+### Mistake 5: Trap Decoy Element `<span class="price-value" style="display:none">`
+- **Mistaken Assumption**: We looked for `.price-value` as the selector for the current price.
+- **What Actually Happened**: The mock store deliberately injects a hidden decoy `<span class="price-value" style="display:none">₹12,462</span>` to trick scrapers! When stripped because of `display:none`, our parser fell back to the whole container, concatenating MRP (`₹15,911`), deal price (`₹12,968`), selling price (`₹10,024`), discount (`37% off`), and stock into one giant number `159111296810024370000`.
+- **The Catch & Fix**: Our strict `validator.ts` immediately threw `Price exceeds sanity threshold`, preventing bad data from entering the database! We updated the DOM extractor to find the visible, non-strikethrough child in `.price-main` with the largest typography (`fontSize >= 2rem`).
+

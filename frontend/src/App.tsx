@@ -16,25 +16,32 @@ export const App: React.FC = () => {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    checkHealth();
-    loadTracked();
+    let mounted = true;
+    let timer: NodeJS.Timeout;
 
-    // Periodic health check every 25 seconds
-    const interval = setInterval(() => {
-      checkHealth();
-      loadTracked();
-    }, 25000);
-    return () => clearInterval(interval);
+    const pollHealth = async () => {
+      try {
+        await api.checkHealth();
+        if (!mounted) return;
+        setHealthStatus('online');
+        loadTracked();
+        // When online, check periodically every 30 seconds
+        timer = setTimeout(pollHealth, 30000);
+      } catch (err) {
+        if (!mounted) return;
+        setHealthStatus('waking');
+        // When waking/cold starting, retry quickly every 4 seconds!
+        timer = setTimeout(pollHealth, 4000);
+      }
+    };
+
+    pollHealth();
+
+    return () => {
+      mounted = false;
+      clearTimeout(timer);
+    };
   }, []);
-
-  const checkHealth = async () => {
-    try {
-      await api.checkHealth();
-      setHealthStatus('online');
-    } catch {
-      setHealthStatus('waking');
-    }
-  };
 
   const loadTracked = async () => {
     try {

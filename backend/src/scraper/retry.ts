@@ -77,8 +77,10 @@ export function classifyError(error: ScraperErrorLike | null | undefined): Scrap
 export function isRetryableError(error: ScraperErrorLike | null | undefined): boolean {
   if (!error) return false;
 
-  const status = error.status || error.http_status;
-  const errorType = classifyError(error);
+  const msg = (error.message || '').toLowerCase();
+  if (msg.includes("executable doesn't exist") || msg.includes('looks like playwright was just updated')) {
+    return false;
+  }
 
   if (status === 404 || status === 410 || status === 400 || status === 403) {
     return false;

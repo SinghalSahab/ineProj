@@ -41,7 +41,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 export const api = {
   async checkHealth(): Promise<{ status: string; uptimeSeconds: number; timestamp: string }> {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 60000);
+    const timeout = setTimeout(() => controller.abort(), 10000);
 
     try {
       const res = await fetch(`${API_BASE}/api/health`, {

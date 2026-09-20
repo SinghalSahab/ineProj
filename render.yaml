@@ -1,12 +1,11 @@
 services:
   - type: web
     name: price-tracker-backend
-    env: node
-    rootDir: backend
+    env: docker
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
     plan: free
     region: oregon
-    buildCommand: npm install && npx playwright install --with-deps chromium
-    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production

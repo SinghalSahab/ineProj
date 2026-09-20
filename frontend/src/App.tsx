@@ -17,7 +17,7 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     let mounted = true;
-    let timer: NodeJS.Timeout;
+    let timer: ReturnType<typeof setTimeout>;
 
     const pollHealth = async () => {
       try {

@@ -78,6 +78,9 @@ export function isRetryableError(error: ScraperErrorLike | null | undefined): bo
   if (!error) return false;
 
   const msg = (error.message || '').toLowerCase();
+  const status = error.status || error.http_status;
+  const errorType = classifyError(error);
+
   if (msg.includes("executable doesn't exist") || msg.includes('looks like playwright was just updated')) {
     return false;
   }
